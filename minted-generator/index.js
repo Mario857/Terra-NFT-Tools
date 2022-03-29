@@ -2,7 +2,7 @@ const axios = require("axios");
 const promiseRetry = require("promise-retry");
 const fs = require("fs/promises");
 
-const MINTER_ADDRESS = "terra18h7u4mda3ds8unwavzv4n6zmn0zxsksvf580zu";
+const MINTER_ADDRESS = "terra18h7u4mda3ds8unwavzv4n6zmn0zxsksvf580zu"; // 
 
 const getAllTransactions = async (contractAddress) => {
   let responseOffset = 0;
