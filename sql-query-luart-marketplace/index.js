@@ -1,8 +1,18 @@
 const axios = require("axios");
 const fs = require("fs/promises");
-const createCsvWriter = require("csv-writer").createObjectCsvWriter;
 const NFT_CONTRACT_ADDRESS = "terra1chu9s72tqguuzgn0tr6rhwvnrgcgzme73y5l4x";
 const alasql = require("alasql");
+const express = require("express");
+const cron = require("node-cron");
+const app = express();
+const port = 8080;
+const bodyParser = require("body-parser");
+
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
+
 const pMap = (...args) =>
   import("p-map").then(({ default: pMap }) => pMap(...args));
 
@@ -11,6 +21,9 @@ function asyncAction(promise) {
     .then((data) => [null, data])
     .catch((error) => [error]);
 }
+
+let luartData = null;
+let dbData = null;
 
 function getTraits(data) {
   let traits = {};
@@ -22,29 +35,6 @@ function getTraits(data) {
     });
 
   return Object.keys(traits);
-}
-
-async function createNFTRaritySheet(path, data) {
-  const traitKeys = getTraits(data);
-  const csvWriter = createCsvWriter({
-    path,
-    header: [
-      { id: "tokenId", title: "Token Id" },
-      { id: "imageURL", title: "ImageUrl" },
-      { id: "name", title: "Name" },
-
-      ...traitKeys.map((value) => ({ id: value, title: value })),
-      ...traitKeys.map((value) => ({ id: `${value}Rarity`, title: value })),
-
-      { id: "price", title: "Price" },
-      { id: "priceUST", title: "Price UST" },
-      { id: "score", title: "Score" },
-      { id: "top", title: "Top" },
-      { id: "rank", title: "Rank" },
-    ],
-  });
-
-  return csvWriter.writeRecords(data);
 }
 
 async function calculateNFTRankings(data) {
@@ -104,19 +94,28 @@ async function calculateNFTRankings(data) {
 
   return result
     .sort((a, b) => b.score - a.score)
-    .map(({ traits, rarities, ...rest }, i) => ({
+    .map(({ traits, rarities, price, ...rest }, i) => ({
       ...rest,
-      traits,
       ...traits,
+      ...price,
       ...Object.fromEntries(
         Object.entries(rarities).map(([key, value]) => [
           `${key}Rarity`,
           `${(100 / +value).toFixed(2)}%`,
         ])
       ),
+      ...Object.fromEntries(
+        Object.entries(rarities).map(([key, value]) => [
+          `${key}RarityRaw`,
+          +((100 / +value).toFixed(2)),
+        ])
+      ),
+      marketplaceURL: `https://marketplace.luart.io/collections/${NFT_CONTRACT_ADDRESS}/${rest.tokenId}`,
       score: rest.score.toFixed(2),
+      scoreRaw: +rest.score.toFixed(2),
       rank: i + 1,
       top: `${(((i + 1) / transformedDataTraits.length) * 100).toFixed(2)}%`,
+      topRaw: +(((i + 1) / transformedDataTraits.length) * 100).toFixed(2)
     }));
 }
 
@@ -130,16 +129,29 @@ async function calculateNFTRankings(data) {
   );
 
   // Get all minted
-  const luartData = Object.values(response.data).filter((x) =>
+  luartData = Object.values(response.data).filter((x) =>
     parsedMinted ? parsedMinted.includes(x.tokenId) : true
   );
 
-  // Generate rankings in json
-  const nftRankings = await calculateNFTRankings(luartData);
-
-  const query = `priceUSD > 1 AND priceUSD < 300 AND Background = 'Terra Planet';`;
-
-  const res = alasql(`SELECT * FROM ? WHERE ${query};`, [nftRankings]);
-
-  console.warn(res);
+  dbData = await calculateNFTRankings(luartData);
 })();
+
+app.post("/", async (req, res) => {
+  const query = req?.body?.query ?? "SELECT * FROM ?";
+
+  try {
+    const response = alasql(query, [dbData]);
+
+    res.send(response);
+  } catch {
+    res.send([]);
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server Listening on port ${port}`);
+});
+
+cron.schedule("*/5 * * * *", async () => {
+  dbData = await calculateNFTRankings(luartData);
+});
