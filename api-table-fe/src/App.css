@@ -1,0 +1,98 @@
+.App {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: #f2f2f2;
+  overflow: hidden;
+  justify-content: center;
+}
+
+.Content {
+  flex: 1;
+  display: flex;
+  max-width: 95%;
+  flex-direction: column;
+  padding: 48px;
+}
+
+.TableWrapper {
+  overflow: auto;
+}
+
+.SearchContainer {
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+}
+
+textarea {
+  font-size: 14px;
+  flex: 1;
+}
+
+textarea[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  height: 50px;
+}
+
+.button:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.jsonTable {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.jsonTable thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+}
+
+.jsonTable th,
+.jsonTable td {
+    padding: 12px 15px;
+}
+
+.jsonTable tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.jsonTable tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.jsonTable tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
+
+.jsonTable tbody tr.active-row {
+  font-weight: bold;
+  color: #009879;
+}
