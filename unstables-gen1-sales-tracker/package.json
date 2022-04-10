@@ -1,0 +1,25 @@
+{
+  "name": "unstables-gen1-sales-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.25.0",
+    "bluebird": "^3.7.2",
+    "discord-reply": "^0.1.2",
+    "discord.js": "^13.6.0",
+    "moment": "^2.29.1",
+    "node-cron": "^3.0.0",
+    "p-map": "^5.3.0",
+    "promise-retry": "^2.0.1",
+    "@terra-money/terra.js": "^3.0.7"
+  },
+  "devDependencies": {
+    "eslint": "^8.8.0"
+  }
+}

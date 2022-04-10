@@ -1,0 +1,1 @@
+scp -r ../unstables-unstable-kwon/** root@86.107.197.59:/root/bots/unstables-unstable-kwon-sales-tracker
