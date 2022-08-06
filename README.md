@@ -1,5 +1,5 @@
-# Terra-NFT-Tools
-Various Tools For NFTs.
+# Terra-Classic-NFT-Tools
+Various Tools For NFTs for Terra Classic.
 
 
 # Presequences
